@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Creating A Raid Array In linux — A Random Physicist's Blog</title>
+	<meta name="description" content="Title: Creating A Raid Array In linux; Date: 2017-04-29; Author: Ashley Setter">
+	<meta name="author" content="Ashley Setter">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+	<!--[if lt IE 9]>
+		<script src="/theme/html5.js"></script>
+		<![endif]-->
+	<link href="/theme/css/ipython.css" rel="stylesheet">
+	<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+	<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+	<link href="//maxcdn.bootstrapcdn.com/bootswatch/3.2.0/simplex/bootstrap.min.css" rel="stylesheet">
+	<link href="/theme/css/local.css" rel="stylesheet">
+	<link href="/theme/css/pygments.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+	<div class="page-header">
+		<h1><a href="/">A Random Physicist's Blog</a>
+			<br>	</div>
+	<div class="row">
+		<div class="col-md-8 col-md-offset-2">
+<div class="article" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="text-center article-header">
+		<h1 itemprop="name headline" class="article-title">Creating A Raid Array In linux</h1>
+		<span itemprop="author" itemscope itemtype="http://schema.org/Person">
+			<h4 itemprop="name">Ashley Setter</h4>
+		</span>
+		<time datetime="2017-04-29T13:00:00+00:00" itemprop="datePublished">Sat 29 April 2017</time>
+	</div>
+	<div>
+		Category:
+		<span itemprop="articleSection">
+			<a href="/category/linux.html" rel="category">Linux</a>
+		</span>
+	</div>
+	<div itemprop="articleBody" class="article-body"><h1>This is a breif tutorial on how to add a raid1 array to an already functioning linux system from the command line</h1>
+<p>For a comprehesive step-by-step tutorial to setting up a linux server with a raid array from scratch I recommend the tutorial <a href="http://linux-sys-adm.com/how-to-install-and-activate-raid-1-ubuntu-server-14.04-lts-step-by-step-by-step/">here</a>.</p>
+<p>I assume as a starting point you have a linux system and have the harddrives are physically attached to the computer.</p>
+<h4>Make SURE that any data that you want off of the hard drives has been taken off / backed up elsewhere as all data on the hard drives used to construct the raid array will be lost. It is also (highly!) advisable that any important data stored on your linux system is also backed up just in case.</h4>
+<h4>I would also advice you to first perform this on a virtual machine (hosted in <a href="https://www.virtualbox.org/wiki/Downloads">virtualBox</a> for example. This way you can have a practise run and if you mess up a command you just have to remake the virtual machine and try again, rather than breaking your server.</h4>
+<p>Now that that is out the way we may begin the process of preparing the hard drives for being in a raid array.</p>
+<p>The very first to do is to find out the current state of your system.</p>
+<p>From the shell prompt lets list the current disks and thier partitions:</p>
+<p><code>lsblk -o NAME,SIZE,TYPE,MOUNTPOINT</code></p>
+<p>What this will look like depends upon what your system looks like, for my system, which was constructed from the tutorial <a href="http://linux-sys-adm.com/how-to-install-and-activate-raid-1-ubuntu-server-14.04-lts-step-by-step-by-step/">here</a> the output looks like this:</p>
+<div class="highlight"><pre><span></span>NAME      SIZE  TYPE MOUNTPOINT
+sda       100G  disk 
+|-sda1     10G  part 
+|  `-- md0 10G  raid1 [SWAP]
+`-sda2     90G  part
+   `-- md1 90G  raid1 /
+sdb       100G  disk 
+|-sdb1     10G  part 
+|  `-- md0 10G  raid1 [SWAP]
+`-sdb2     90G  part
+   `-- md1 90G  raid1 /
+sdc         8G  disk
+sdd         8G  disk
+sr0      1024M  rom
+</pre></div>
+
+
+<p>So currently I have 2 hard drives each with 2 partitions, each has a swap partition, which is in a raid1 setup in raid array md0 and has 10GB, and each has a boot partition mounted to root which has 90GB and is in a raid1 setup also, in raid array md1.</p>
+<p>We also have 2 empty hard drives, <code>sdc</code> and <code>sdd</code> which contain 8GB of space that need to be partitioned before we can do anything with them.</p>
+<p>So now we need to do is to partition the hard drives, we can do this using fdisk</p>
+<p>First we will start fdisk from the shell to partition the drive <code>sdc</code>:</p>
+<p><code>sudo fdisk /dev/sdc</code></p>
+<p>typing p will issue the print table command and show the current drive partitions in <code>sdc</code>, currently we have no partititons so it just shows us information about the drives size and that is has no partitions.</p>
+<div class="highlight"><pre><span></span>command (m for help): p
+Disk /dev/sdc: 8589 MB, 8589934592 bytes
+255 heads, 63 sectors/track, 1044 cylinders, total 16777216 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/phyisical) : 512 bytes / 512 bytes
+I/O size (minimum/optimal) : 512 bytes / 512 bytes
+Disk identifier: 0x3e73dada
+
+      Device Boot        Start            End       Blocks     ld      System
+</pre></div>
+
+
+<p>We will now partition this to 2 primary partitions: a 500MB swap partition and a 7.5GB bootable partiton which we can store data on.</p>
+<p>First the 500MB swap partition:</p>
+<div class="highlight"><pre><span></span>Command (m for help): n
+Partion type:
+   p   primary (0 primary, 0 extended, 4 free)
+   e   extended
+Select (default p): p
+Partition number (1-4, default 1): &lt;RETURN&gt;
+using default value 1
+First sector (2048-16777215, default 2048):&lt;RETURN&gt;
+Using default value 2048
+Last sector, *sectors or +size(K,M,G) (2048-16777215, default 16777215): +500M
+</pre></div>
+
+
+<p>printing the partiton table now looks like so:</p>
+<div class="highlight"><pre><span></span>Disk /dev/sdc: 8589 MB, 8589934592 bytes
+255 heads, 63 sectors/track, 1044 cylinders, total 16777216 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/phyisical) : 512 bytes / 512 bytes
+I/O size (minimum/optimal) : 512 bytes / 512 bytes
+Disk identifier: 0x3e73dada
+
+      Device Boot        Start            End       Blocks     ld      System
+/dev/sdc1                2048             1026047   512000     83      Linux
+</pre></div>
+
+
+<p>Next we will use the rest of the space for the bootable partition:</p>
+<div class="highlight"><pre><span></span>Command (m for help): n
+Partion type:
+   p   primary (0 primary, 0 extended, 4 free)
+   e   extended
+Select (default p): p
+Partition number (1-4, default 2): &lt;RETURN&gt;
+using default value 2
+First sector (1026048-16777215, default 1026048):&lt;RETURN&gt;
+Using default value 1026048
+Last sector, *sectors or +size(K,M,G) (2048-16777215, default 16777215):&lt;RETURN&gt;
+Using default value 16777215
+</pre></div>
+
+
+<p>printing the partiton table now looks like so:</p>
+<div class="highlight"><pre><span></span>Command (m for help): p
+Disk /dev/sdc: 8589 MB, 8589934592 bytes
+255 heads, 63 sectors/track, 1044 cylinders, total 16777216 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/phyisical) : 512 bytes / 512 bytes
+I/O size (minimum/optimal) : 512 bytes / 512 bytes
+Disk identifier: 0x3e73dada
+
+      Device Boot        Start            End       Blocks     ld      System
+/dev/sdc1                2048             1026047   512000     83      Linux
+/dev/sdc2             1026048            16777215  7875584     83      Linux
+</pre></div>
+
+
+<p>We will now tell it to use the first partition as swap space:</p>
+<div class="highlight"><pre><span></span>Command (m for help): t
+Partition number (1-4): 1
+Hex code (type L to list codes): 82
+Changed system type of partition 1 to 82 (Linux swap / Solaris)
+</pre></div>
+
+
+<p>And now to make the 2nd partiton bootable we do the following</p>
+<div class="highlight"><pre><span></span>Command (m for help): a
+Partition number (1-4): 2
+</pre></div>
+
+
+<p>printing the partition table now looks like so:</p>
+<div class="highlight"><pre><span></span>Command (m for help): p
+Disk /dev/sdc: 8589 MB, 8589934592 bytes
+255 heads, 63 sectors/track, 1044 cylinders, total 16777216 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/phyisical) : 512 bytes / 512 bytes
+I/O size (minimum/optimal) : 512 bytes / 512 bytes
+Disk identifier: 0x3e73dada
+
+      Device Boot        Start            End       Blocks     ld      System
+/dev/sdc1                2048             1026047   512000     82      Linux swap     / Solaris
+/dev/sdc2       *     1026048            16777215  7875584     83      Linux
+</pre></div>
+
+
+<p>Finally I write these changes to disk</p>
+<div class="highlight"><pre><span></span>command (m for help): w
+The partition table has been altered!
+
+Calling ioctl() to re-read partition table.
+Syncing disks.
+</pre></div>
+
+
+<p>It should now have written these changes to the disk</p>
+<p>Running <code>lsblk -o NAME,SIZE,TYPE,MOUNTPOINT</code> again should result in something like the following:</p>
+<div class="highlight"><pre><span></span>NAME      SIZE  TYPE MOUNTPOINT
+sda       100G  disk 
+|-sda1     10G  part 
+|  `-- md0 10G  raid1 [SWAP]
+`-sda2     90G  part
+   `-- md1 90G  raid1 /
+sdb       100G  disk 
+|-sdb1     10G  part 
+|  `-- md0 10G  raid1 [SWAP]
+`-sdb2     90G  part
+   `-- md1 90G  raid1 /
+sdc         8G  disk
+|-sdc1    500M  part 
+`-sdc2    7.5G  part
+sdd         8G  disk
+sr0      1024M  rom
+</pre></div>
+
+
+<p>Now we can repeat the same procedure with <code>sdd</code> so that it looks identical to <code>sdc</code>.</p>
+<p>And my system now looks like so:</p>
+<div class="highlight"><pre><span></span>NAME      SIZE  TYPE MOUNTPOINT
+sda       100G  disk 
+|-sda1     10G  part 
+|  `-- md0 10G  raid1 [SWAP]
+`-sda2     90G  part
+   `-- md1 90G  raid1 /
+sdb       100G  disk 
+|-sdb1     10G  part 
+|  `-- md0 10G  raid1 [SWAP]
+`-sdb2     90G  part
+   `-- md1 90G  raid1 /
+sdc         8G  disk
+|-sdc1    500M  part 
+`-sdc2    7.5G  part
+sdd         8G  disk
+|-sdd1    500M  part 
+`-sdd2    7.5G  part
+sr0      1024M  rom
+</pre></div>
+
+
+<p>If I now look at the raid arrays I already in <code>/dev/md</code> by running <code>ls /dev/md/*</code> I see </p>
+<div class="highlight"><pre><span></span>&gt; ls /dev/md/*
+/dev/md/0   /dev/md/1
+</pre></div>
+
+
+<p>We can now use mdadm to create the raid array for us</p>
+<p><code>sudo mdadm --create --verbose /dev/md/2 --level=1 /des--raid-devices=2 /dev/sdc /dev/sdd</code></p>
+<p>We should now see a new file in /dev/md like so:</p>
+<div class="highlight"><pre><span></span>&gt; ls /dev/md/*
+/dev/md/0   /dev/md/1   /dev/md/2
+</pre></div>
+
+
+<p>and now we can create a filesystem on the array </p>
+<p><code>sudo mkfs.ext4 -F /dev/md/2</code></p>
+<p>Now we create a mount point like so:</p>
+<p><code>sudo mkdir -p /media/md2</code></p>
+<p>and change the permissions on <code>/media/md2</code> so that any user may access it any way they like by doing:</p>
+<p><code>sudo chmod -R 777 /media/md2</code></p>
+<p>and we should now be able to mount our completed raid1 array like so:</p>
+<p><code>sudo mount /dev/md/2 /media/md2</code></p></div>
+	<hr>
+	<h2>Comments</h2>
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'arandomphysicistsblog'; 
+    var disqus_title = 'Creating A Raid Array In linux';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+		</div>
+	</div> 	<!-- <hr> -->
+</div> <!-- /container -->
+<footer class="aw-footer bg-danger">
+	<div class="container"> <!-- footer -->
+		<div class="row">
+			<div class="col-md-10 col-md-offset-1">
+				<div class="row">
+					<div class="col-md-3">
+						<h4>Navigation</h4>
+						<ul class="list-unstyled my-list-style">
+							<li><a href="">A Random Physicist's Blog</a></li>
+							<li><a href="/feeds/all.atom.xml" type="application/atom+xml"><i class="fa fa-rss "></i> atom</a></li>
+						</ul>
+					</div>
+					<div class="col-md-3">
+						<h4>Author</h4>
+						<ul class="list-unstyled my-list-style">
+							<li><a href="https://www.linkedin.com/in/ashleysetter">LinkedIn</a></li>
+							<li><a href="https://github.com/AshleySetter">Github</a></li>
+							<li><a href="https://twitter.com/ashleysetter">Twitter</a></li>
+							<li><a href="https://cmg.soton.ac.uk/people/ajs3g11/">Southampton University Page</a></li>
+						</ul>
+					</div>
+					<div class="col-md-3">
+						<h4>Categories</h4>
+						<ul class="list-unstyled my-list-style">
+							<li><a href="/category/Blog-Content.html">Blog Content (1)</a></li>
+							<li><a href="/category/Linux.html">Linux (1)</a></li>
+						</ul>
+					</div>
+					<div class="col-md-3">
+						<h4>Links</h4>
+						<ul class="list-unstyled my-list-style">
+							<li><a href="http://getpelican.com/">Pelican</a></li>
+							<li><a href="http://python.org/">Python.org</a></li>
+							<li><a href="http://www.ngcm.soton.ac.uk">CDT in NGCM</a></li>
+							<li><a href="http://www.qlm.soton.ac.uk">Quantum, Light and Matter Homepage</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</footer>
+<div class="container">
+	<div class="row">
+		<div class="col-md-12 text-center center-block aw-bottom">
+			<p>&copy; Ashley Setter 2014</p>
+			<p>Powered by Pelican</p>
+		</div>
+	</div>
+</div>
+<div class="container">
+	<div class="row">
+		<div class="col-md-12 text-right center-block aw-bottom">
+			<p>El Psy Congroo</p>
+		</div>
+	</div>
+</div>
+<!-- JavaScript -->
+<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+	$("div.collapseheader").click(function () {
+		$header = $(this).children("span").first();
+		$codearea = $(this).children(".input_area");
+		$codearea.slideToggle(500, function () {
+			$header.text(function () {
+				return $codearea.is(":visible") ? "Collapse Code" : "Expand Code";
+			});
+		});
+	});
+});
+</script>
+</body>
+</html>
