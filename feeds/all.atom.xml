@@ -184,28 +184,29 @@ sr0      1024M  rom
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;If I now look at the raid arrays I already in &lt;code&gt;/dev/md&lt;/code&gt; by running &lt;code&gt;ls /dev/md/*&lt;/code&gt; I see &lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&amp;gt; ls /dev/md/*
-/dev/md/0   /dev/md/1
+&lt;p&gt;If I now look at the raid arrays I already in &lt;code&gt;/dev/&lt;/code&gt; by running &lt;code&gt;ls /dev/md*&lt;/code&gt; I see &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&amp;gt; ls /dev/md*
+/dev/md   /dev/md0   /dev/md1
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;We can now use mdadm to create the raid array for us&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;sudo mdadm --create --verbose /dev/md/2 --level=1 /des--raid-devices=2 /dev/sdc /dev/sdd&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;We should now see a new file in /dev/md like so:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&amp;gt; ls /dev/md/*
-/dev/md/0   /dev/md/1   /dev/md/2
+&lt;p&gt;&lt;code&gt;sudo mdadm --create --verbose /dev/md2 --level=1 --raid-devices=2 /dev/sdc1 /dev/sdd1&lt;/code&gt;
+/
+We should now see a new file in /dev/md like so:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&amp;gt; ls /dev/md*
+/dev/md    /dev/md0   /dev/md1   /dev/md2
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;and now we can create a filesystem on the array &lt;/p&gt;
-&lt;p&gt;&lt;code&gt;sudo mkfs.ext4 -F /dev/md/2&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;sudo mkfs.ext4 -F /dev/md2&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;Now we create a mount point like so:&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;sudo mkdir -p /media/md2&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;and change the permissions on &lt;code&gt;/media/md2&lt;/code&gt; so that any user may access it any way they like by doing:&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;sudo chmod -R 777 /media/md2&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;and set the owner as your user&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;sudo chown &amp;lt;user&amp;gt;:&amp;lt;user&amp;gt; /media/md2&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;and we should now be able to mount our completed raid1 array like so:&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;sudo mount /dev/md/2 /media/md2&lt;/code&gt;&lt;/p&gt;</content></entry><entry><title>Introduction</title><link href="/introduction.html" rel="alternate"></link><published>2016-06-12T23:00:00+00:00</published><updated>2016-06-12T23:00:00+00:00</updated><author><name>Ashley Setter</name></author><id>tag:None,2016-06-12:/introduction.html</id><summary type="html">&lt;p&gt;This blog's purpose and content&lt;/p&gt;</summary><content type="html">&lt;p&gt;Hello world!&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;sudo mount /dev/md2 /media/md2&lt;/code&gt;&lt;/p&gt;</content></entry><entry><title>Introduction</title><link href="/introduction.html" rel="alternate"></link><published>2016-06-12T23:00:00+00:00</published><updated>2016-06-12T23:00:00+00:00</updated><author><name>Ashley Setter</name></author><id>tag:None,2016-06-12:/introduction.html</id><summary type="html">&lt;p&gt;This blog's purpose and content&lt;/p&gt;</summary><content type="html">&lt;p&gt;Hello world!&lt;/p&gt;
 &lt;p&gt;I am Ashley, a Physics graduate and PhD student in the Centre for Doctoral Training for Next Generation Computational Modelling and in the Quantum, Light and Matter group at the University of Southampton. I am interested in programming, physics and all sorts of stuff.&lt;/p&gt;
 &lt;p&gt;I regularly program in Python, C and C++ for work and for fun! I also, as part of my PhD, programme hardware (namely FPGAs [Field Programmable Gate Arrays]) using VHDL and Verilog. My PhD is in experimental Quantum Physics, in particular I am working in the field of levitated Optomechanics, which basically means particles levitated with lasers; cool, right?&lt;/p&gt;
 &lt;p&gt;My PhD is looking at ways to control these levitated particles by altering properties of the laser. Currently I am in the process of learning the theory behind DSP (Digital Signal Processing) in order to implement a programme on the FPGA which will modulate the laser power in response to how the levitated particle moves. By doing this in a particular way I should be able to 'cool down' the particle, by this I mean slow down its oscillation.&lt;/p&gt;

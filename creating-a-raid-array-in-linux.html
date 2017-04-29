@@ -223,28 +223,29 @@ sr0      1024M  rom
 </pre></div>
 
 
-<p>If I now look at the raid arrays I already in <code>/dev/md</code> by running <code>ls /dev/md/*</code> I see </p>
-<div class="highlight"><pre><span></span>&gt; ls /dev/md/*
-/dev/md/0   /dev/md/1
+<p>If I now look at the raid arrays I already in <code>/dev/</code> by running <code>ls /dev/md*</code> I see </p>
+<div class="highlight"><pre><span></span>&gt; ls /dev/md*
+/dev/md   /dev/md0   /dev/md1
 </pre></div>
 
 
 <p>We can now use mdadm to create the raid array for us</p>
-<p><code>sudo mdadm --create --verbose /dev/md/2 --level=1 /des--raid-devices=2 /dev/sdc /dev/sdd</code></p>
-<p>We should now see a new file in /dev/md like so:</p>
-<div class="highlight"><pre><span></span>&gt; ls /dev/md/*
-/dev/md/0   /dev/md/1   /dev/md/2
+<p><code>sudo mdadm --create --verbose /dev/md2 --level=1 --raid-devices=2 /dev/sdc1 /dev/sdd1</code>
+/
+We should now see a new file in /dev/md like so:</p>
+<div class="highlight"><pre><span></span>&gt; ls /dev/md*
+/dev/md    /dev/md0   /dev/md1   /dev/md2
 </pre></div>
 
 
 <p>and now we can create a filesystem on the array </p>
-<p><code>sudo mkfs.ext4 -F /dev/md/2</code></p>
+<p><code>sudo mkfs.ext4 -F /dev/md2</code></p>
 <p>Now we create a mount point like so:</p>
 <p><code>sudo mkdir -p /media/md2</code></p>
-<p>and change the permissions on <code>/media/md2</code> so that any user may access it any way they like by doing:</p>
-<p><code>sudo chmod -R 777 /media/md2</code></p>
+<p>and set the owner as your user</p>
+<p><code>sudo chown &lt;user&gt;:&lt;user&gt; /media/md2</code></p>
 <p>and we should now be able to mount our completed raid1 array like so:</p>
-<p><code>sudo mount /dev/md/2 /media/md2</code></p></div>
+<p><code>sudo mount /dev/md2 /media/md2</code></p></div>
 	<hr>
 	<h2>Comments</h2>
 <div id="disqus_thread"></div>

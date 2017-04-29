@@ -184,25 +184,26 @@ sr0      1024M  rom
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;If I now look at the raid arrays I already in &lt;code&gt;/dev/md&lt;/code&gt; by running &lt;code&gt;ls /dev/md/*&lt;/code&gt; I see &lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&amp;gt; ls /dev/md/*
-/dev/md/0   /dev/md/1
+&lt;p&gt;If I now look at the raid arrays I already in &lt;code&gt;/dev/&lt;/code&gt; by running &lt;code&gt;ls /dev/md*&lt;/code&gt; I see &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&amp;gt; ls /dev/md*
+/dev/md   /dev/md0   /dev/md1
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;We can now use mdadm to create the raid array for us&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;sudo mdadm --create --verbose /dev/md/2 --level=1 /des--raid-devices=2 /dev/sdc /dev/sdd&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;We should now see a new file in /dev/md like so:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&amp;gt; ls /dev/md/*
-/dev/md/0   /dev/md/1   /dev/md/2
+&lt;p&gt;&lt;code&gt;sudo mdadm --create --verbose /dev/md2 --level=1 --raid-devices=2 /dev/sdc1 /dev/sdd1&lt;/code&gt;
+/
+We should now see a new file in /dev/md like so:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&amp;gt; ls /dev/md*
+/dev/md    /dev/md0   /dev/md1   /dev/md2
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;and now we can create a filesystem on the array &lt;/p&gt;
-&lt;p&gt;&lt;code&gt;sudo mkfs.ext4 -F /dev/md/2&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;sudo mkfs.ext4 -F /dev/md2&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;Now we create a mount point like so:&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;sudo mkdir -p /media/md2&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;and change the permissions on &lt;code&gt;/media/md2&lt;/code&gt; so that any user may access it any way they like by doing:&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;sudo chmod -R 777 /media/md2&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;and set the owner as your user&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;sudo chown &amp;lt;user&amp;gt;:&amp;lt;user&amp;gt; /media/md2&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;and we should now be able to mount our completed raid1 array like so:&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;sudo mount /dev/md/2 /media/md2&lt;/code&gt;&lt;/p&gt;</content></entry></feed>
+&lt;p&gt;&lt;code&gt;sudo mount /dev/md2 /media/md2&lt;/code&gt;&lt;/p&gt;</content></entry></feed>
