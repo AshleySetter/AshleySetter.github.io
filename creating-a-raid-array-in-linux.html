@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>Creating A Raid Array In linux — A Random Physicist's Blog</title>
-	<meta name="description" content="Title: Creating A Raid Array In linux; Date: 2017-04-29; Author: Ashley Setter">
+	<title>Creating A Raid Array In Linux — A Random Physicist's Blog</title>
+	<meta name="description" content="Title: Creating A Raid Array In Linux; Date: 2017-04-29; Author: Ashley Setter">
 	<meta name="author" content="Ashley Setter">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
@@ -26,7 +26,7 @@
 		<div class="col-md-8 col-md-offset-2">
 <div class="article" itemscope itemtype="http://schema.org/BlogPosting">
 	<div class="text-center article-header">
-		<h1 itemprop="name headline" class="article-title">Creating A Raid Array In linux</h1>
+		<h1 itemprop="name headline" class="article-title">Creating A Raid Array In Linux</h1>
 		<span itemprop="author" itemscope itemtype="http://schema.org/Person">
 			<h4 itemprop="name">Ashley Setter</h4>
 		</span>
@@ -38,14 +38,14 @@
 			<a href="/category/linux.html" rel="category">Linux</a>
 		</span>
 	</div>
-	<div itemprop="articleBody" class="article-body"><h1>This is a breif tutorial on how to add a raid1 array to an already functioning linux system from the command line</h1>
-<p>For a comprehesive step-by-step tutorial to setting up a linux server with a raid array from scratch I recommend the tutorial <a href="http://linux-sys-adm.com/how-to-install-and-activate-raid-1-ubuntu-server-14.04-lts-step-by-step-by-step/">here</a>.</p>
-<p>I assume as a starting point you have a linux system and have the harddrives are physically attached to the computer.</p>
-<h4>Make SURE that any data that you want off of the hard drives has been taken off / backed up elsewhere as all data on the hard drives used to construct the raid array will be lost. It is also (highly!) advisable that any important data stored on your linux system is also backed up just in case.</h4>
+	<div itemprop="articleBody" class="article-body"><h1>This is a brief tutorial on how to add a raid1 array to an already functioning Linux system from the command line</h1>
+<p>For a comprehensive step-by-step tutorial to setting up a Linux server with a raid array from scratch I recommend the tutorial <a href="http://linux-sys-adm.com/how-to-install-and-activate-raid-1-ubuntu-server-14.04-lts-step-by-step-by-step/">here</a>.</p>
+<p>I assume as a starting point you have a Linux system and have the hard-drives are physically attached to the computer.</p>
+<h4>Make SURE that any data that you want off of the hard drives has been taken off / backed up elsewhere as all data on the hard drives used to construct the raid array will be lost. It is also (highly!) advisable that any important data stored on your Linux system is also backed up just in case.</h4>
 <h4>I would also advice you to first perform this on a virtual machine (hosted in <a href="https://www.virtualbox.org/wiki/Downloads">virtualBox</a> for example. This way you can have a practise run and if you mess up a command you just have to remake the virtual machine and try again, rather than breaking your server.</h4>
 <p>Now that that is out the way we may begin the process of preparing the hard drives for being in a raid array.</p>
 <p>The very first to do is to find out the current state of your system.</p>
-<p>From the shell prompt lets list the current disks and thier partitions:</p>
+<p>From the shell prompt lets list the current disks and their partitions:</p>
 <p><code>lsblk -o NAME,SIZE,TYPE,MOUNTPOINT</code></p>
 <p>What this will look like depends upon what your system looks like, for my system, which was constructed from the tutorial <a href="http://linux-sys-adm.com/how-to-install-and-activate-raid-1-ubuntu-server-14.04-lts-step-by-step-by-step/">here</a> the output looks like this:</p>
 <div class="highlight"><pre><span></span>NAME      SIZE  TYPE MOUNTPOINT
@@ -70,12 +70,12 @@ sr0      1024M  rom
 <p>So now we need to do is to partition the hard drives, we can do this using fdisk</p>
 <p>First we will start fdisk from the shell to partition the drive <code>sdc</code>:</p>
 <p><code>sudo fdisk /dev/sdc</code></p>
-<p>typing p will issue the print table command and show the current drive partitions in <code>sdc</code>, currently we have no partititons so it just shows us information about the drives size and that is has no partitions.</p>
+<p>typing p will issue the print table command and show the current drive partitions in <code>sdc</code>, currently we have no partitions so it just shows us information about the drives size and that is has no partitions.</p>
 <div class="highlight"><pre><span></span>command (m for help): p
 Disk /dev/sdc: 8589 MB, 8589934592 bytes
 255 heads, 63 sectors/track, 1044 cylinders, total 16777216 sectors
 Units = sectors of 1 * 512 = 512 bytes
-Sector size (logical/phyisical) : 512 bytes / 512 bytes
+Sector size (logical/physical) : 512 bytes / 512 bytes
 I/O size (minimum/optimal) : 512 bytes / 512 bytes
 Disk identifier: 0x3e73dada
 
@@ -83,10 +83,10 @@ Disk identifier: 0x3e73dada
 </pre></div>
 
 
-<p>We will now partition this to 2 primary partitions: a 500MB swap partition and a 7.5GB bootable partiton which we can store data on.</p>
+<p>We will now partition this to 2 primary partitions: a 500MB swap partition and a 7.5GB bootable partition which we can store data on.</p>
 <p>First the 500MB swap partition:</p>
 <div class="highlight"><pre><span></span>Command (m for help): n
-Partion type:
+Partition type:
    p   primary (0 primary, 0 extended, 4 free)
    e   extended
 Select (default p): p
@@ -98,11 +98,11 @@ Last sector, *sectors or +size(K,M,G) (2048-16777215, default 16777215): +500M
 </pre></div>
 
 
-<p>printing the partiton table now looks like so:</p>
+<p>printing the partition table now looks like so:</p>
 <div class="highlight"><pre><span></span>Disk /dev/sdc: 8589 MB, 8589934592 bytes
 255 heads, 63 sectors/track, 1044 cylinders, total 16777216 sectors
 Units = sectors of 1 * 512 = 512 bytes
-Sector size (logical/phyisical) : 512 bytes / 512 bytes
+Sector size (logical/physical) : 512 bytes / 512 bytes
 I/O size (minimum/optimal) : 512 bytes / 512 bytes
 Disk identifier: 0x3e73dada
 
@@ -113,7 +113,7 @@ Disk identifier: 0x3e73dada
 
 <p>Next we will use the rest of the space for the bootable partition:</p>
 <div class="highlight"><pre><span></span>Command (m for help): n
-Partion type:
+Partition type:
    p   primary (0 primary, 0 extended, 4 free)
    e   extended
 Select (default p): p
@@ -126,12 +126,12 @@ Using default value 16777215
 </pre></div>
 
 
-<p>printing the partiton table now looks like so:</p>
+<p>printing the partition table now looks like so:</p>
 <div class="highlight"><pre><span></span>Command (m for help): p
 Disk /dev/sdc: 8589 MB, 8589934592 bytes
 255 heads, 63 sectors/track, 1044 cylinders, total 16777216 sectors
 Units = sectors of 1 * 512 = 512 bytes
-Sector size (logical/phyisical) : 512 bytes / 512 bytes
+Sector size (logical/physical) : 512 bytes / 512 bytes
 I/O size (minimum/optimal) : 512 bytes / 512 bytes
 Disk identifier: 0x3e73dada
 
@@ -149,7 +149,7 @@ Changed system type of partition 1 to 82 (Linux swap / Solaris)
 </pre></div>
 
 
-<p>And now to make the 2nd partiton bootable we do the following</p>
+<p>And now to make the 2nd partition bootable we do the following</p>
 <div class="highlight"><pre><span></span>Command (m for help): a
 Partition number (1-4): 2
 </pre></div>
@@ -160,7 +160,7 @@ Partition number (1-4): 2
 Disk /dev/sdc: 8589 MB, 8589934592 bytes
 255 heads, 63 sectors/track, 1044 cylinders, total 16777216 sectors
 Units = sectors of 1 * 512 = 512 bytes
-Sector size (logical/phyisical) : 512 bytes / 512 bytes
+Sector size (logical/physical) : 512 bytes / 512 bytes
 I/O size (minimum/optimal) : 512 bytes / 512 bytes
 Disk identifier: 0x3e73dada
 
@@ -250,7 +250,7 @@ sr0      1024M  rom
 <div id="disqus_thread"></div>
 <script type="text/javascript">
     var disqus_shortname = 'arandomphysicistsblog'; 
-    var disqus_title = 'Creating A Raid Array In linux';
+    var disqus_title = 'Creating A Raid Array In Linux';
 
     (function() {
         var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

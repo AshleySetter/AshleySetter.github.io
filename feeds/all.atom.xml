@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>A Random Physicist's Blog</title><link href="/" rel="alternate"></link><link href="/feeds/all.atom.xml" rel="self"></link><id>/</id><updated>2017-04-29T13:00:00+00:00</updated><entry><title>Creating A Raid Array In linux</title><link href="/creating-a-raid-array-in-linux.html" rel="alternate"></link><published>2017-04-29T13:00:00+00:00</published><updated>2017-04-29T13:00:00+00:00</updated><author><name>Ashley Setter</name></author><id>tag:None,2017-04-29:/creating-a-raid-array-in-linux.html</id><summary type="html">&lt;p&gt;How to create a raid array from stratch in linux&lt;/p&gt;</summary><content type="html">&lt;h1&gt;This is a breif tutorial on how to add a raid1 array to an already functioning linux system from the command line&lt;/h1&gt;
-&lt;p&gt;For a comprehesive step-by-step tutorial to setting up a linux server with a raid array from scratch I recommend the tutorial &lt;a href="http://linux-sys-adm.com/how-to-install-and-activate-raid-1-ubuntu-server-14.04-lts-step-by-step-by-step/"&gt;here&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;I assume as a starting point you have a linux system and have the harddrives are physically attached to the computer.&lt;/p&gt;
-&lt;h4&gt;Make SURE that any data that you want off of the hard drives has been taken off / backed up elsewhere as all data on the hard drives used to construct the raid array will be lost. It is also (highly!) advisable that any important data stored on your linux system is also backed up just in case.&lt;/h4&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>A Random Physicist's Blog</title><link href="/" rel="alternate"></link><link href="/feeds/all.atom.xml" rel="self"></link><id>/</id><updated>2017-04-29T13:00:00+00:00</updated><entry><title>Creating A Raid Array In Linux</title><link href="/creating-a-raid-array-in-linux.html" rel="alternate"></link><published>2017-04-29T13:00:00+00:00</published><updated>2017-04-29T13:00:00+00:00</updated><author><name>Ashley Setter</name></author><id>tag:None,2017-04-29:/creating-a-raid-array-in-linux.html</id><summary type="html">&lt;p&gt;How to create a raid array from scratch in Linux&lt;/p&gt;</summary><content type="html">&lt;h1&gt;This is a brief tutorial on how to add a raid1 array to an already functioning Linux system from the command line&lt;/h1&gt;
+&lt;p&gt;For a comprehensive step-by-step tutorial to setting up a Linux server with a raid array from scratch I recommend the tutorial &lt;a href="http://linux-sys-adm.com/how-to-install-and-activate-raid-1-ubuntu-server-14.04-lts-step-by-step-by-step/"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;I assume as a starting point you have a Linux system and have the hard-drives are physically attached to the computer.&lt;/p&gt;
+&lt;h4&gt;Make SURE that any data that you want off of the hard drives has been taken off / backed up elsewhere as all data on the hard drives used to construct the raid array will be lost. It is also (highly!) advisable that any important data stored on your Linux system is also backed up just in case.&lt;/h4&gt;
 &lt;h4&gt;I would also advice you to first perform this on a virtual machine (hosted in &lt;a href="https://www.virtualbox.org/wiki/Downloads"&gt;virtualBox&lt;/a&gt; for example. This way you can have a practise run and if you mess up a command you just have to remake the virtual machine and try again, rather than breaking your server.&lt;/h4&gt;
 &lt;p&gt;Now that that is out the way we may begin the process of preparing the hard drives for being in a raid array.&lt;/p&gt;
 &lt;p&gt;The very first to do is to find out the current state of your system.&lt;/p&gt;
-&lt;p&gt;From the shell prompt lets list the current disks and thier partitions:&lt;/p&gt;
+&lt;p&gt;From the shell prompt lets list the current disks and their partitions:&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;lsblk -o NAME,SIZE,TYPE,MOUNTPOINT&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;What this will look like depends upon what your system looks like, for my system, which was constructed from the tutorial &lt;a href="http://linux-sys-adm.com/how-to-install-and-activate-raid-1-ubuntu-server-14.04-lts-step-by-step-by-step/"&gt;here&lt;/a&gt; the output looks like this:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;NAME      SIZE  TYPE MOUNTPOINT
@@ -31,12 +31,12 @@ sr0      1024M  rom
 &lt;p&gt;So now we need to do is to partition the hard drives, we can do this using fdisk&lt;/p&gt;
 &lt;p&gt;First we will start fdisk from the shell to partition the drive &lt;code&gt;sdc&lt;/code&gt;:&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;sudo fdisk /dev/sdc&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;typing p will issue the print table command and show the current drive partitions in &lt;code&gt;sdc&lt;/code&gt;, currently we have no partititons so it just shows us information about the drives size and that is has no partitions.&lt;/p&gt;
+&lt;p&gt;typing p will issue the print table command and show the current drive partitions in &lt;code&gt;sdc&lt;/code&gt;, currently we have no partitions so it just shows us information about the drives size and that is has no partitions.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;command (m for help): p
 Disk /dev/sdc: 8589 MB, 8589934592 bytes
 255 heads, 63 sectors/track, 1044 cylinders, total 16777216 sectors
 Units = sectors of 1 * 512 = 512 bytes
-Sector size (logical/phyisical) : 512 bytes / 512 bytes
+Sector size (logical/physical) : 512 bytes / 512 bytes
 I/O size (minimum/optimal) : 512 bytes / 512 bytes
 Disk identifier: 0x3e73dada
 
@@ -44,10 +44,10 @@ Disk identifier: 0x3e73dada
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;We will now partition this to 2 primary partitions: a 500MB swap partition and a 7.5GB bootable partiton which we can store data on.&lt;/p&gt;
+&lt;p&gt;We will now partition this to 2 primary partitions: a 500MB swap partition and a 7.5GB bootable partition which we can store data on.&lt;/p&gt;
 &lt;p&gt;First the 500MB swap partition:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Command (m for help): n
-Partion type:
+Partition type:
    p   primary (0 primary, 0 extended, 4 free)
    e   extended
 Select (default p): p
@@ -59,11 +59,11 @@ Last sector, *sectors or +size(K,M,G) (2048-16777215, default 16777215): +500M
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;printing the partiton table now looks like so:&lt;/p&gt;
+&lt;p&gt;printing the partition table now looks like so:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Disk /dev/sdc: 8589 MB, 8589934592 bytes
 255 heads, 63 sectors/track, 1044 cylinders, total 16777216 sectors
 Units = sectors of 1 * 512 = 512 bytes
-Sector size (logical/phyisical) : 512 bytes / 512 bytes
+Sector size (logical/physical) : 512 bytes / 512 bytes
 I/O size (minimum/optimal) : 512 bytes / 512 bytes
 Disk identifier: 0x3e73dada
 
@@ -74,7 +74,7 @@ Disk identifier: 0x3e73dada
 
 &lt;p&gt;Next we will use the rest of the space for the bootable partition:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Command (m for help): n
-Partion type:
+Partition type:
    p   primary (0 primary, 0 extended, 4 free)
    e   extended
 Select (default p): p
@@ -87,12 +87,12 @@ Using default value 16777215
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;printing the partiton table now looks like so:&lt;/p&gt;
+&lt;p&gt;printing the partition table now looks like so:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Command (m for help): p
 Disk /dev/sdc: 8589 MB, 8589934592 bytes
 255 heads, 63 sectors/track, 1044 cylinders, total 16777216 sectors
 Units = sectors of 1 * 512 = 512 bytes
-Sector size (logical/phyisical) : 512 bytes / 512 bytes
+Sector size (logical/physical) : 512 bytes / 512 bytes
 I/O size (minimum/optimal) : 512 bytes / 512 bytes
 Disk identifier: 0x3e73dada
 
@@ -110,7 +110,7 @@ Changed system type of partition 1 to 82 (Linux swap / Solaris)
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;And now to make the 2nd partiton bootable we do the following&lt;/p&gt;
+&lt;p&gt;And now to make the 2nd partition bootable we do the following&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Command (m for help): a
 Partition number (1-4): 2
 &lt;/pre&gt;&lt;/div&gt;
@@ -121,7 +121,7 @@ Partition number (1-4): 2
 Disk /dev/sdc: 8589 MB, 8589934592 bytes
 255 heads, 63 sectors/track, 1044 cylinders, total 16777216 sectors
 Units = sectors of 1 * 512 = 512 bytes
-Sector size (logical/phyisical) : 512 bytes / 512 bytes
+Sector size (logical/physical) : 512 bytes / 512 bytes
 I/O size (minimum/optimal) : 512 bytes / 512 bytes
 Disk identifier: 0x3e73dada
 
