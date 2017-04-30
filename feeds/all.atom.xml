@@ -191,9 +191,8 @@ sr0      1024M  rom
 
 
 &lt;p&gt;We can now use mdadm to create the raid array for us&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;sudo mdadm --create --verbose /dev/md2 --level=1 --raid-devices=2 /dev/sdc1 /dev/sdd1&lt;/code&gt;
-/
-We should now see a new file in /dev/md like so:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;sudo mdadm --create --verbose /dev/md2 --level=1 --raid-devices=2 /dev/sdc1 /dev/sdd1&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;We should now see a new file in /dev/md like so:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&amp;gt; ls /dev/md*
 /dev/md    /dev/md0   /dev/md1   /dev/md2
 &lt;/pre&gt;&lt;/div&gt;
