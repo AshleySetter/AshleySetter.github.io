@@ -204,5 +204,7 @@ sr0      1024M  rom
 &lt;p&gt;&lt;code&gt;sudo mkdir -p /media/md2&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;and set the owner as your user&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;sudo chown &amp;lt;user&amp;gt;:&amp;lt;user&amp;gt; /media/md2&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;and set write permissions to this folder for everyone&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;sudo chmod a+w /media/md2&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;and we should now be able to mount our completed raid1 array like so:&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;sudo mount /dev/md2 /media/md2&lt;/code&gt;&lt;/p&gt;</content></entry></feed>

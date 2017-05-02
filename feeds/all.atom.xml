@@ -204,6 +204,8 @@ sr0      1024M  rom
 &lt;p&gt;&lt;code&gt;sudo mkdir -p /media/md2&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;and set the owner as your user&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;sudo chown &amp;lt;user&amp;gt;:&amp;lt;user&amp;gt; /media/md2&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;and set write permissions to this folder for everyone&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;sudo chmod a+w /media/md2&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;and we should now be able to mount our completed raid1 array like so:&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;sudo mount /dev/md2 /media/md2&lt;/code&gt;&lt;/p&gt;</content></entry><entry><title>Introduction</title><link href="/introduction.html" rel="alternate"></link><published>2016-06-12T23:00:00+00:00</published><updated>2016-06-12T23:00:00+00:00</updated><author><name>Ashley Setter</name></author><id>tag:None,2016-06-12:/introduction.html</id><summary type="html">&lt;p&gt;This blog's purpose and content&lt;/p&gt;</summary><content type="html">&lt;p&gt;Hello world!&lt;/p&gt;
 &lt;p&gt;I am Ashley, a Physics graduate and PhD student in the Centre for Doctoral Training for Next Generation Computational Modelling and in the Quantum, Light and Matter group at the University of Southampton. I am interested in programming, physics and all sorts of stuff.&lt;/p&gt;
